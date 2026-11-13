@@ -1,0 +1,43 @@
+
+name: Build PDF Master APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'PDF_Master_Android_Project.zip'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Extract Android Project
+        run: |
+          unzip -o PDF_Master_Android_Project.zip -d project
+          cp -r project/. .
+
+      - name: Build APK
+        run: |
+          gradle --version
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF-Master-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
